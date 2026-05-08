@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: frontend #name of the Service. - Pods can access frontend using this name http://frontend
+  namespace: chat-app
+spec:
+  selector:
+    app:  frontend #Send traffic to Pods having label app=frontend
+  type:  ClusterIP
+  ports:
+    port:  80
+    targetPort:  80

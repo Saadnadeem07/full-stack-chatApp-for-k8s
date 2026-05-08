@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: mongodb #name of the Service. - Pods can access mongodb using this name http://mongodb
+  namespace: chat-app
+spec:
+  selector:
+    app:  mongodb #Send traffic to Pods having label app=mongodb
+  type:  ClusterIP
+  ports:
+    port:  27017
+    targetPort:  27017
