@@ -21,5 +21,12 @@ spec:
         env:
         - name:  NODE_ENV #env variable
           value:  production # env variable value
+        - name: MONGODB_URI
+          value: "mongodb://mongoadmin:secret@mongodb:27017/dbname?authSource=admin"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: chatapp-secrets
+              key: jwt 
         ports:
         - containerPort:  5001 #The container listens on port 5001
