@@ -16,7 +16,7 @@ spec:
         app: mongodb #pod label
     spec:
       containers:
-      - image: mongodb:latest #dockerhub image from where we will get the mongodb image
+      - image: mongo:latest #dockerhub image from where we will get the mongodb image
         name:  chatapp-mongodb #container name 
         env:
         - name: MONGO_INITDB_ROOT_USERNAME
