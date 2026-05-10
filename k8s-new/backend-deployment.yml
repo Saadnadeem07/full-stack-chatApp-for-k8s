@@ -1,35 +1,65 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-deployment #our deployment name
-  namespace: chat-app #deployment namespace
+  name: backend-deployment
+  namespace: chat-app
   labels:
-    app:  backend #deployment label
+    app: backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend #the label which deployment will match to get it's pods
+      app: backend
   template:
     metadata:
       labels:
-        app: backend #pod label
+        app: backend
     spec:
+      initContainers:
+      - name: wait-for-mongodb
+        image: busybox:1.36
+        command:
+          - sh
+          - -c
+          - |
+            echo "waiting for mongodb..."
+            until nc -z mongodb 27017; do
+              echo "mongodb is not up yet, sleeping..."
+              sleep 2
+            done
+            echo "mongodb is up"
       containers:
-      - image:  saadnadeem07/chatapp-backend #dockerhub image from where we will get the backend image
-        name:  chatapp-backend #container name 
+      - image: saadnadeem07/chatapp-backend:latest
+        imagePullPolicy: Always
+        name: chatapp-backend
         ports:
-        - containerPort:  5001 #The container listens on port 5001
+        - containerPort: 5001
         env:
-        - name:  NODE_ENV #env variable
-          value:  production # env variable value
+        - name: NODE_ENV
+          value: production
         - name: MONGODB_URI
           value: "mongodb://mongoadmin:secret@mongodb:27017/dbname?authSource=admin"
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
               name: chatapp-secrets
-              key: jwt 
+              key: jwt
         - name: PORT
           value: "5001"
-        
+        readinessProbe:
+          tcpSocket:
+            port: 5001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 5001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"

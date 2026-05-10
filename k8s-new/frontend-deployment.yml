@@ -1,25 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-deployment #our deployment name
-  namespace: chat-app #deployment namespace
+  name: frontend-deployment
+  namespace: chat-app
   labels:
-    app:  frontend #deployment label
+    app: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend #the label which deployment will match to get it's pods
+      app: frontend
   template:
     metadata:
       labels:
-        app: frontend #pod label
+        app: frontend
     spec:
       containers:
-      - image:  saadnadeem07/chatapp-frontend #dockerhub image from where we will get the frontend image
-        name:  chatapp-frontend #container name 
+      - image: saadnadeem07/chatapp-frontend:latest
+        imagePullPolicy: Always
+        name: chatapp-frontend
         env:
-        - name:  NODE_ENV #env variable
-          value:  production # env variable value
+        - name: NODE_ENV
+          value: production
         ports:
-        - containerPort:  80
+        - containerPort: 80
+        readinessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"

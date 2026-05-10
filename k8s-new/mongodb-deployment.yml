@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongodb-deployment #our deployment name
-  namespace: chat-app #deployment namespace
+  name: mongodb-deployment
+  namespace: chat-app
   labels:
-    app:  mongodb #deployment label
+    app: mongodb
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongodb #the label which deployment will match to get it's pods
+      app: mongodb
   template:
     metadata:
       labels:
-        app: mongodb #pod label
+        app: mongodb
     spec:
       containers:
-      - image: mongo:latest #dockerhub image from where we will get the mongodb image
-        name:  chatapp-mongodb #container name 
+      - image: mongo:6.0
+        name: chatapp-mongodb
         ports:
         - containerPort: 27017
         env:
@@ -25,7 +25,27 @@ spec:
           value: mongoadmin
         - name: MONGO_INITDB_ROOT_PASSWORD
           value: secret
+        volumeMounts:
+        - name: mongo-data
+          mountPath: /data/db
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        readinessProbe:
+          tcpSocket:
+            port: 27017
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 27017
+          initialDelaySeconds: 30
+          periodSeconds: 10
       volumes:
       - name: mongo-data
         persistentVolumeClaim:
-          claimName: mongodb-pvc   
+          claimName: mongodb-pvc
