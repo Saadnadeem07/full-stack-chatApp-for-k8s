@@ -18,6 +18,8 @@ spec:
       containers:
       - image:  saadnadeem07/chatapp-backend #dockerhub image from where we will get the backend image
         name:  chatapp-backend #container name 
+        ports:
+        - containerPort:  5001 #The container listens on port 5001
         env:
         - name:  NODE_ENV #env variable
           value:  production # env variable value
@@ -28,5 +30,6 @@ spec:
             secretKeyRef:
               name: chatapp-secrets
               key: jwt 
-        ports:
-        - containerPort:  5001 #The container listens on port 5001
+        - name: PORT
+          value: "5001"
+        
